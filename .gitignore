@@ -1,0 +1,14 @@
+# Compiled class file, target repos, ...
+*.class
+target/
+
+# Log file
+*.log
+
+
+# IDE files
+.idea/
+*.iml
+
+# Spark & related
+metastore_db
