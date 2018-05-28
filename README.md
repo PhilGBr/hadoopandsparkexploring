@@ -85,7 +85,7 @@ A date, le repository contient:<ul>
 <p><code>exit</code></p>
 <h3>Etape 3.2: copie depuis le poste (de dev) sur le fs local du driver</h3>
 <p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/data_preparation/* &lt;user&gt;@&lt;ip&gt;:~/spark-test/scripts</code></p>
-<p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/launching/run-on-spark.sh &lt;user&gt;@&lt;ip&gt;:~/spark-test</code></p>
+<p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/launching/run_with_spark-submit.sh &lt;user&gt;@&lt;ip&gt;:~/spark-test</code></p>
 <h3>Etape 3.3: Execution du script de chargement depuis le driver</h3>
 <p><code>ssh -p &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; &lt;user&gt;@&lt;ip&gt;</code></p>
 <p><code>cd spark-test</code></p>
@@ -100,10 +100,16 @@ A date, le repository contient:<ul>
 <code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; target/*.jar &lt;user&gt;@&lt;ip&gt;:~/spark-test</code>
 
 <h2>Etape 6: Configuration log4j</h2>
-<p>Note: il existe d'autres façons de configurer log4j pour une application Spark.</p>
+<p>Notes:<ul>
+<li>Il existe différentes façons de (re-)configurer log4j pour une application Spark, qui varient selon le mode de soumission du job à exécuter, et la partie de code ciblée par la modification de configuration</li>
+<li>En l'occurrence, la modification de configuration log4j impacte uniquement du code exécuté par le driver</li>
+<li>Par ailleurs, la soumission de job spark se fait en mode <code>'client'</code></li>
+<li>Il n'est donc pas nécessaire ici de propager la configuration aux executors</li></ul>
+</p>
+<h3>Etape 6.1: localisation du fichier à modifier</h3>
 <p>Localiser le fichier log4j.properties de la distribution Spark installée sur le driver.</p>
 <p>Exemple: pour la distribution HDP 2.6.4 d'Hortonworks, en étant loggué en tant que <code>maria_dev</code>, le fichier se trouve sous <code>/etc/spark2/2.6.4.0-91/0/log4j.properties</code></p>
-
+<h3>Etape 6.2: édition du fichier</h3>
 <p>Editer le fichier, et ajouter la configuration suivante <span style="color:red">(en prenant soin de modifier le chemin vers le fichier de logs)</span>:</p>
 <p><code>log4j.logger.philgbr.exploration.spark.utils.LogExecutionTime=INFO, console, exectimeFileAppender</code></p>
 <p><code>log4.additivity.philgbr.exploration.spark.utils.LogExecutionTime=true</code></p>
@@ -111,14 +117,14 @@ A date, le repository contient:<ul>
 <p><code>log4j.appender.exectimeFileAppender=org.apache.log4j.FileAppender</code></p>
 <p><code>log4j.appender.exectimeFileAppender.File=<span style="color:red">/tmp/spark-tasks-execution-time.log</span></code></p>
 <p><code>log4j.appender.exectimeFileAppender.layout=org.apache.log4j.PatternLayout</code></p>
-<p><code>log4j.appender.coexectimeFileAppendernsole.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n</code></p>
+<p><code>log4j.appender.exectimeFileAppender.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n</code></p>
 
 
 <h2>Etape 7: Lancement du programme depuis le noeud driver</h2>
 
 <p><code>ssh -p &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; &lt;user&gt;@&lt;ip&gt;</code></p>
 <p><code>cd spark-test</code></p>
-<p>Editer le fichier <code>run_with_spark-submit.sh</code>pour <b>ajuster si besoin la valeur de la variable <code>MASTER_URL</code></b>
+<p>Editer le fichier <code>run_with_spark-submit.sh</code> et <span style="color:red"><b>modifier si besoin la valeur de la variable <code>MASTER_URL</code></span></b>
 <p><code>vi run_with_spark-submit.sh</code></p>
 <p><code>./run_with_spark-submit.sh</code></p>
 
