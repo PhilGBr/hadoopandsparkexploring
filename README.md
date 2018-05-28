@@ -7,8 +7,8 @@
 
 <h1>Priorités</h1>
 Spark étant un sujet "relativement" vaste et complexe (tant en terme d'APIs que de configurations de déploiement - et même que de configuration tout court !), j'ai du établir un choix drastique quant aux APIs que j'allais aborder ici.</p>
-<p>Le thème initialement retenu était l'étude des différentes possibilités et techniques de JOINTURE de datasets avec Spark (les jointures sur de gros volumes étant toujours une source de lenteurs et d'erreur d'exécution (OOM, No space left on disk, ...).</p>
-<p>A date, le code ne reflète pas le choix initial</p>
+<p>Le thème initialement retenu était l'étude des différentes possibilités et techniques de JOINTURE de datasets avec Spark, les jointures sur de gros volumes étant toujours une source de lenteurs et d'erreurs d'exécution (OOM, No space left on disk, ...).</p>
+<p>A date, le code ne reflète pas ce choix initial</p>
 
 <h1>Choix de la version de Spark</h1>
 J'ai choisi de travailler avec une version Spark 2.x récente. Je me suis aligné sur la version de la distribution que j'allais employer pour les tests, à savoir [Hortonworks Data Platform 2.6.4](https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.4/bk_release-notes/content/comp_versions.html) qui supporte la version 2.2.
@@ -54,9 +54,9 @@ A date, le repository contient:<ul>
 
 <h3>Pré-requis: environnement d'exécution</h3>
 <p><b>Un environnement Hadoop (HDFS, HIVE) + Spark 2.x est nécessaire</b></p>
-<p>un compte utilisateur <b>accessible via ssh, et pour lequel l'environnement Hadoop/Spark est accessible et configuré</b></p>
-<p>pour la création de la base HIVE et le chargement des données, les scripts de chargement nécessitent l'outil en ligne de commande bee
-<p>les scripts de chargement nécessitent bash, configuré comme shell par défaut via le vers /bin/sh (au besoin, le #shebang des scripts .sh pourra être modifié).
+<p>Un compte utilisateur <b>accessible via ssh, et pour lequel l'environnement Hadoop/Spark est accessible et configuré</b></p>
+<p>Pour la création de la base HIVE et le chargement des données, les scripts de chargement nécessitent l'outil en ligne de commande beeline
+<p>Les scripts de chargement nécessitent que <code>bash</code> soit configuré comme shell par défaut via un lien sur <code>/bin/sh</code> (au besoin, le #shebang des scripts .sh pourra être modifié).</p>
 
 
 <h2>Installation</h2>
@@ -84,12 +84,12 @@ A date, le repository contient:<ul>
 <p>Après exécution, quitter pour revenir à la session sur le poste (de dev)</p>
 <p><code>exit</code></p>
 <h3>Etape 3.2: copie depuis le poste (de dev) sur le fs local du driver</h3>
-<code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/data_preparation/* &lt;user&gt;@&lt;ip&gt;:~/spark-test/scripts</code>
-<code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/launching/run-on-spark.sh &lt;user&gt;@&lt;ip&gt;:~/spark-test</code>
+<p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/data_preparation/* &lt;user&gt;@&lt;ip&gt;:~/spark-test/scripts</code></p>
+<p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/launching/run-on-spark.sh &lt;user&gt;@&lt;ip&gt;:~/spark-test</code></p>
 <h3>Etape 3.3: Execution du script de chargement depuis le driver</h3>
 <p><code>ssh -p &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; &lt;user&gt;@&lt;ip&gt;</code></p>
 <p><code>cd spark-test</code></p>
-<p><code>.scripts/run_all.sh</code></p>
+<p><code>./scripts/run_all.sh</code></p>
 <p>Après le chargement des données, quitter pour revenir à la session sur le poste (de dev)</p>
 <p><code>exit</code></p>
 
@@ -109,7 +109,7 @@ A date, le repository contient:<ul>
 <p><code>log4.additivity.philgbr.exploration.spark.utils.LogExecutionTime=true</code></p>
 
 <p><code>log4j.appender.exectimeFileAppender=org.apache.log4j.FileAppender</code></p>
-<p><code>log4j.appender.exectimeFileAppender.File=<span style="color:red">/tmp/</span>spark-tasks-execution-time.log</code></p>
+<p><code>log4j.appender.exectimeFileAppender.File=<span style="color:red">/tmp/spark-tasks-execution-time.log</span></code></p>
 <p><code>log4j.appender.exectimeFileAppender.layout=org.apache.log4j.PatternLayout</code></p>
 <p><code>log4j.appender.coexectimeFileAppendernsole.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n</code></p>
 
@@ -130,11 +130,12 @@ A date, le repository contient:<ul>
 <h1>Reste à faire</h1>
 <h2>Corrections</h2>
 <p>En l'état, 2 erreurs d'exécution sur le cluster HDP n'ont pas encore été corrigées. Elles concernent toutes les deux les implémentations RDD. Ces erreurs ne se produisent pas dans les tests unitaires.<p>
-<p>Par ailleurs, un clean up du programme Main.java doit être réalisé: le code de création de l'instance SparkSession n'est plus adaptée à la méthode de lancement (via spark-submit).</p>
-<h2>Next Step</h2>
+<p>Par ailleurs, un clean up du programme Main.java doit être réalisé: le code de création de l'instance SparkSession n'est plus adapté à la méthode de lancement (via spark-submit).</p>
+<h2>Next Steps</h2>
 <p><ul>
-<li> Faire varier les clauses de stockages des tables HIVES pour observer les effets sur les temps de traitements</li>
-<li> "Scaler les données", ajouter et faire varier les clauses de partionnements, et constater les effets en terme de temps de traitement</li>>
-<p> Déployer sur un cluster EMR, faire varier les configs de cluster, et constater les performances des différentes configurations de cluster</li>
+<li> Faire varier les clauses de stockages des tables HIVE pour observer les effets sur les temps de traitements</li>
+<li> "Scaler les données", ajouter et faire varier les clauses de partionnements, et constater les effets en terme de temps de traitement</li>
+<li> Déployer sur un cluster EMR, faire varier les configs de cluster, et constater les performances des différentes configurations de cluster</li>
+</ul>
 
 
