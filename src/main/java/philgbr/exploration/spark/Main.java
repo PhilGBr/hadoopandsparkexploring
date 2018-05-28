@@ -55,7 +55,7 @@ public class Main {
 
 		for (String methodName : FindMoviesWithLowestAvgRating.METHODS_UNDER_TEST) {
 			try {
-				Method method = FindMoviesWithLowestAvgRating.class.getMethod(methodName, new Class[] { SparkSession.class, String.class });
+				Method method = FindMoviesWithLowestAvgRating.class.getMethod(methodName, new Class[] {  SparkSession.class, String.class, int.class, int.class  });
 				method.invoke(finderF, spark, dbSchemaName, nbMinRatings, limit);
 			} catch(Exception e) {
 				LOGGER.error(String.format("An error occured during the execution of %s.%s", FindMoviesWithLowestAvgRating.class.getName(), methodName), e);
