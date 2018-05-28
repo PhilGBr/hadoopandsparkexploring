@@ -1,6 +1,8 @@
-package philgbr.exploration.spark.tasks;
+package philgbr.exploration.spark.db;
 
 import org.apache.spark.sql.SparkSession;
+
+import static philgbr.exploration.spark.db.MovieLensTables.getQualifiedName;
 
 import java.io.File;
 import java.util.HashMap;
@@ -40,7 +42,7 @@ public class MovielensDbFixture {
                 .schema(table.schema())
                 .csv(getFixtureFileName(table.name()))
                 .toDF()
-                .createOrReplaceTempView((hiveDatabase != null ? hiveDatabase+"." : "") + table.name());
+                .createOrReplaceTempView(getQualifiedName(table, hiveDatabase));
     }
 
 
@@ -66,7 +68,7 @@ public class MovielensDbFixture {
     private static void checkFixtureFile(MovieLensTables table) throws Exception{
         File f= new File(getFixtureFileName(table.name()));
         if(!f.exists() || !f.isFile() || !f.canRead()) {
-            throw new Exception("Readable fixture file " + f.getName() + " is missing for table " + table.name());
+            throw new Exception("Readable fixture file " + f.getAbsolutePath() + " is missing for table " + table.name());
         }
     }
 

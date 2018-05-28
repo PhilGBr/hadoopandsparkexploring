@@ -8,18 +8,20 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This aspect measures execution time of methods annotated with {@link LogMyTime} and logs them.
+ */
 @Aspect
 public class LogExecutionTime {
-    private static final String LOG_MESSAGE_FORMAT = "%s.%s execution time: %dms";
+    private static final String LOG_MESSAGE_FORMAT = "%s.%s exectime(ms): %d";
     private static final Logger LOG = LoggerFactory.getLogger(LogExecutionTime.class);
 
-    //@Pointcut("execution(@philgbr.exploration.spark.utils.LogMyTime * *(..))")
-    @Pointcut("execution(@philgbr.exploration.spark * *(..))")
-
+    @Pointcut("execution(@philgbr.exploration.spark.utils.LogMyTime * *.*(..))")
     public void isAnnotated() {}
 
     @Around("isAnnotated()")
     public Object get(final ProceedingJoinPoint joinPoint) throws Throwable  {
+    	
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Object retVal = joinPoint.proceed(joinPoint.getArgs());

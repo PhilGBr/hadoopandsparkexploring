@@ -1,5 +1,17 @@
 package philgbr.exploration.spark.tasks;
 
+import static org.apache.spark.sql.functions.asc;
+import static org.apache.spark.sql.functions.avg;
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.count;
+import static org.apache.spark.sql.functions.desc;
+import static philgbr.exploration.spark.db.MovieLensTables.RATINGS;
+import static philgbr.exploration.spark.db.MovieLensTables.getQualifiedName;
+
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -10,22 +22,19 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import philgbr.exploration.spark.utils.LogMyTime;
 import scala.Tuple2;
-
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.List;
-
-import static org.apache.spark.sql.functions.*;
-import static philgbr.exploration.spark.tasks.MovieLensTables.RATINGS;
+import scala.Tuple3;
 
 public class FindMoviesWithLowestAvgRating {
 
+	public static final String[] METHODS_UNDER_TEST = {"hiveImpl1", "dfopImpl1", "dsImpl1", "rddImpl1"};
+	
     private static final Logger LOG = LoggerFactory.getLogger(FindMoviesWithLowestAvgRating.class);
 
     private static final String QRY_MOVIE_DISTRIBUTION = "select movie_id, avg(rating) as avg_ratings, count(*) as nb_ratings " +
-            "from ratings " +
+            "from %s " +
             "group by movie_id " +
             "having nb_ratings > %s " +
             "order by avg_ratings asc, nb_ratings desc " +
@@ -35,14 +44,14 @@ public class FindMoviesWithLowestAvgRating {
      * Dataframe implementation 1.
      */
     @LogMyTime
-    void hiveImpl1(SparkSession spark, int minNbRatings, int limit) {
-        spark.sql(String.format(QRY_MOVIE_DISTRIBUTION, minNbRatings, limit)).show(true);
+    public void hiveImpl1(SparkSession spark, String dbSchemaName, int minNbRatings, int limit) {
+        spark.sql(String.format(QRY_MOVIE_DISTRIBUTION, getQualifiedName(RATINGS, dbSchemaName), minNbRatings, limit)).show(true);
     }
 
     @LogMyTime
-    void dfopImpl1(SparkSession spark, int minNbRatings, int limit) {
+    public void dfopImpl1(SparkSession spark, String dbSchemaName, int minNbRatings, int limit) {
 
-        Dataset<Row> df = spark.table(RATINGS.toString())
+        Dataset<Row> df = spark.table(getQualifiedName(RATINGS, dbSchemaName))
                 .select("movie_id", "rating")
                 .groupBy(col("movie_id"))
                 .agg(count("rating").as("rating_count"), avg("rating").as("avg_rating"))
@@ -58,16 +67,16 @@ public class FindMoviesWithLowestAvgRating {
      * Only valuable to demonstrate how to get "cast" data into strongly used defined type using {@link Encoders}
      */
     @LogMyTime
-    void dsImpl1(SparkSession spark, int minNbRatings, int limit) {
+    public void dsImpl1(SparkSession spark, String dbSchemaName, int minNbRatings, int limit) {
 
-        Dataset<Tuple2<Integer, Float>> ds = spark.table(RATINGS.toString())
+        Dataset<Tuple2<Integer, Float>> ds = spark.table(getQualifiedName(RATINGS, dbSchemaName))
                 //.select(col("movie_id").as(Encoders.INT()), col("rating")  // doesn't work -> need to compose an Encoder for both columns at the same time
                 .select("movie_id", "rating").as(Encoders.tuple(Encoders.INT(), Encoders.FLOAT()));
 
-        Dataset<Tuple2<Integer, Float>> groupedDs = ds.groupBy(col("movie_id"))
-                .agg(count("rating").as("rating_count"), avg("rating").as("avg_rating")).as(Encoders.tuple(Encoders.INT(), Encoders.FLOAT()))
+        Dataset<Tuple3<Integer, Long, Double>> groupedDs = ds.groupBy(col("movie_id"))
+                .agg(count("rating").as("rating_count"), avg("rating").as("avg_rating")).as(Encoders.tuple(Encoders.INT(), Encoders.LONG(), Encoders.DOUBLE()))
                 .filter("rating_count > " + minNbRatings)
-                .orderBy("avg_rating asc", "nb_ratings desc")
+                .orderBy(asc("avg_rating"), desc("rating_count"))
                 .limit(limit);
 
         groupedDs.show(true);
@@ -77,10 +86,10 @@ public class FindMoviesWithLowestAvgRating {
      * RDD implementation (
      */
     @LogMyTime
-    void rddImpl1(SparkSession spark, int minNbRatings, int limit) {
+    public void rddImpl1(SparkSession spark, String dbSchemaName, int minNbRatings, int limit) {
 
 
-        JavaRDD<Tuple2<Integer, Float>> javaRdd = spark.table(RATINGS.toString())
+        JavaRDD<Tuple2<Integer, Float>> javaRdd = spark.table(getQualifiedName(RATINGS, dbSchemaName))
                 .select("movie_id", "rating").as(Encoders.tuple(Encoders.INT(), Encoders.FLOAT()))
                 .toJavaRDD();
 
@@ -120,7 +129,8 @@ public class FindMoviesWithLowestAvgRating {
 
 
 
-    public static class AvgAccumulator implements Serializable {
+    @SuppressWarnings("serial")
+	public static class AvgAccumulator implements Serializable {
 
         public float sum;
         public int count;
@@ -161,13 +171,13 @@ public class FindMoviesWithLowestAvgRating {
         return a;
     };
 
-    public static class TupleAvgAccComparator implements Comparator<Tuple2<Integer, AvgAccumulator>>, Serializable {
+    @SuppressWarnings("serial")
+	public static class TupleAvgAccComparator implements Comparator<Tuple2<Integer, AvgAccumulator>>, Serializable {
 
         final static TupleAvgAccComparator INSTANCE = new TupleAvgAccComparator();
 
         public int compare(Tuple2<Integer, AvgAccumulator> t1, Tuple2<Integer, AvgAccumulator> t2) {
-            AvgAccumulator a1= t1._2();
-            AvgAccumulator a2= t1._2();
+        	
             int compareAvg = Float.compare(t1._2().avg(), t1._2().avg());  // Ascending order on avg rating
             if(compareAvg != 0) {
                 return compareAvg;

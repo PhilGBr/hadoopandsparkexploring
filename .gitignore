@@ -1,6 +1,7 @@
 # Compiled class file, target repos, ...
 *.class
 target/
+bin/
 
 # Log file
 *.log
@@ -9,6 +10,11 @@ target/
 # IDE files
 .idea/
 *.iml
+.classpath
+.project
+.settings/
+
+
 
 # Spark & related
 metastore_db

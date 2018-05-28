@@ -20,7 +20,8 @@ class SparkTestExtension implements TestInstancePostProcessor, ParameterResolver
     private static SparkSession spark;
 
     private static synchronized SparkSession getSparkOrInitialize(ExtensionContext extensionContext) {
-        if (spark == null) { // Note: only one Spark session will be created per JVM, no matter if requested configurations differ
+    	
+        if (spark == null) { // Note: only one Spark session will be created per JVM, no matter if the requested configurations differ
             SparkTestConfig config = getSparkConfig(extensionContext);
 
             LOG.info("Starting SparkSession " + config.master() + " for application " + config.appName());

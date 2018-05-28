@@ -7,12 +7,8 @@
 ./05_load_files_into_tables.sh
 ./06_count_all.sh
 ./07_populate_derived_data.sh
-
-# En l'état les statistics ne sont pas calculées automatiquement par run_all.sh: l'idée est de pouvoir
-# comparer le comportement des jobs Spark AVANT / APRES calcul des statistiques
-
 #./08_compute_statistics.sh TABLES_ONLY
-#./08_compute_statistics.sh TABLES_AND_COLUMNS
+./08_compute_statistics.sh TABLES_AND_COLUMNS
 
 
 

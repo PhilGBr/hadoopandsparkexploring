@@ -10,11 +10,11 @@
  *   Main Use Case:
  *   <p>
  *       Running several JUnit tests that require a {@link org.apache.spark.sql.SparkSession} on an isolated
- *       isolated local dev environment, all the JUnit test sharing the same Spark session instance.
+ *       local dev environment, all these JUnit tests sharing the same Spark session instance.
  *   </p>
  *   Motivations:
  *   <ul>
- *       <li>Spark session initialisation is rather slow (10 to 20+...  seconds) and as such, is not efficient for unit testing</li>
+ *       <li>Spark session initialization is rather slow (10 to 20+...  seconds) and as such, is not efficient for unit testing</li>
  *       <li>Running different unit tests - possibly in parallel - that would each require their own Spark session can lead to
  *       initialize different Spark sessions on the local dev environment: it is not only slow, but it is also
  *       tedious to configure properly so that all resources can run in parallel in an isolated environment and avoid

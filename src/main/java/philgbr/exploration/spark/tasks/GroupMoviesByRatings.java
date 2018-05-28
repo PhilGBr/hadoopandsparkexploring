@@ -10,30 +10,38 @@ import philgbr.exploration.spark.utils.LogMyTime;
 import scala.Tuple2;
 
 import static org.apache.spark.sql.functions.col;
-import static philgbr.exploration.spark.tasks.MovieLensTables.RATINGS;
+import static philgbr.exploration.spark.db.MovieLensTables.*;
+
 
 public class GroupMoviesByRatings {
 
+	public static final String[] METHODS_UNDER_TEST = {"hiveImpl1"
+														, "dfopImpl1", "dfopImpl2"
+														, "dsImpl1", "dsImpl2"
+														, "rddImpl1", "rddImpl2"};
+
     private static final Logger LOG = LoggerFactory.getLogger(GroupMoviesByRatings.class);
 
-    private static final String QRY_MOVIE_DISTRIBUTION = "select rating, count(*) as nb_ratings " +
-                                                            "from ratings "+
-                                                            "group by rating ";
 
+    
     /**
      *  Dataframe implementation 1.
      *
      */
     @LogMyTime
-    void hiveImpl1(SparkSession spark) {
-
-        spark.sql(QRY_MOVIE_DISTRIBUTION).show(true);
+    public void hiveImpl1(SparkSession spark, String dbSchemaName) {
+    	
+    	String qry = new StringBuilder(" select rating, count(*) as nb_ratings ")
+    								.append(" from ").append(getQualifiedName(RATINGS, dbSchemaName))
+    								.append(" group by rating ")
+    								.toString();
+        spark.sql(qry).show(true);
     }
 
     @LogMyTime
-    void dfopImpl1(SparkSession spark) {
-
-        spark.table(RATINGS.toString())
+    public void dfopImpl1(SparkSession spark, String dbSchemaName) {
+    	
+        spark.table(getQualifiedName(RATINGS, dbSchemaName))
                 .select(col("rating"))
                 .groupBy(col("rating"))
                 .count()
@@ -45,9 +53,9 @@ public class GroupMoviesByRatings {
      */
 
     @LogMyTime
-    void dfopImpl2(SparkSession spark) {
+    public void dfopImpl2(SparkSession spark, String dbSchemaName) {
 
-        spark.table(RATINGS.toString())
+        spark.table(getQualifiedName(RATINGS, dbSchemaName))
               //.select(col("rating")) // oups !
                 .groupBy(col("rating"))
                 .count()
@@ -58,9 +66,9 @@ public class GroupMoviesByRatings {
      * Implementation based on the strongly typed Dataset API.
      */
      @LogMyTime
-     void dsImpl1(SparkSession spark) {
+     public void dsImpl1(SparkSession spark, String dbSchemaName) {
 
-         Dataset<Float> ds = spark.table(RATINGS.toString())
+         Dataset<Float> ds = spark.table(getQualifiedName(RATINGS, dbSchemaName))
                                 .select("rating").as(Encoders.FLOAT());
 
          RelationalGroupedDataset groupDs= ds.groupBy(col("rating"));
@@ -72,7 +80,7 @@ public class GroupMoviesByRatings {
      *
      */
     @LogMyTime
-    void dsImpl2(SparkSession spark) {
+    public void dsImpl2(SparkSession spark, String dbSchemaName) {
 
         Encoder<Rating> ratingEncoder = Encoders.bean(Rating.class);
 
@@ -80,8 +88,8 @@ public class GroupMoviesByRatings {
             // the line above does not work as column names (ex.: 'movie_id') and field names (ex.: 'movieId') doest not match
 
         Dataset<Rating> ds =
-                spark.table(RATINGS.toString())
-                .selectExpr("movie_id as movieId", "user_id as userId", "rating", "timestamp")
+                spark.table(getQualifiedName(RATINGS, dbSchemaName))
+                .selectExpr("movie_id as movieId", "user_id as userId", "rating", "time as timestamp")
                 .as(ratingEncoder);
 
         Dataset<Float> fds=ds.select(col("rating")).as(Encoders.FLOAT());
@@ -96,11 +104,11 @@ public class GroupMoviesByRatings {
      *
      */
     @LogMyTime
-    void rddImpl1(SparkSession spark) {
+    public void rddImpl1(SparkSession spark, String dbSchemaName) {
         Encoder<Rating> ratingEncoder = Encoders.bean(Rating.class);
 
-        JavaRDD<Rating> typedRdd = spark.table(RATINGS.toString())
-                                    .selectExpr("movie_id as movieId", "user_id as userId", "rating", "timestamp")
+        JavaRDD<Rating> typedRdd = spark.table(getQualifiedName(RATINGS, dbSchemaName))
+                                    .selectExpr("movie_id as movieId", "user_id as userId", "rating", "time as timestamp")
                                     .as(ratingEncoder).toJavaRDD();
 
         JavaPairRDD<Float, Iterable<Rating>> typedPairRdd = typedRdd.groupBy(Rating::getRating);
@@ -114,26 +122,17 @@ public class GroupMoviesByRatings {
      *
      */
     @LogMyTime
-    void rddImpl2(SparkSession spark) {
+    public void rddImpl2(SparkSession spark, String dbSchemaName) {
 
-        JavaRDD<Float> typedRdd = spark.table(RATINGS.toString())
+        JavaRDD<Float> typedRdd = spark.table(getQualifiedName(RATINGS, dbSchemaName))
                 .selectExpr("rating").as(Encoders.FLOAT())
                 .toJavaRDD();
 
-        JavaPairRDD<Float, Integer> pairRdd = typedRdd.mapToPair(r -> new Tuple2(r, 1));
+        JavaPairRDD<Float, Integer> pairRdd = typedRdd.mapToPair(r -> new Tuple2<Float, Integer>(r, 1));
 
         pairRdd.reduceByKey((v1, v2) -> v1 + v2).collect()
                 .forEach(tuple -> {
                     LOG.info("Rating : " + tuple._1 + "  |  Count : " + tuple._2);
                 });
     }
-
-
-
-
-
-
-
-
-
 }

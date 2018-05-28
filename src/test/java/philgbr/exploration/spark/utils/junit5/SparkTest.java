@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Add annotation on Spark test class with public field of type SparkSession, or on Spark test method with parameter
+ * Add annotation on Spark test class with <b>public field of type SparkSession</b>, or on Spark test method with parameter
  * of type SparkSession, to get injected SparkSession. The SparkSession is automatically initialized at the beginning
- * of tests and is shared between test instances.
+ * of tests and is shared between test instances.<p>
  *
  * <b>Sources</b><ul>
  *     <li>Forked from  https://github.com/lesfurets/lesfurets-conferences/blob/gh-pages/src/apache-spark/src/test/java/com/lesfurets/spark/junit5/extension/SparkTest.java</li>
