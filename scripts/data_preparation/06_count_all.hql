@@ -1,12 +1,12 @@
-    select 'genomes_scores' as name, count(*) as cpt from movielens.genome_scores
+    select 'genomes_scores' as name, count(*) as cpt from genome_scores
 union all
-	select 'genome_tags' as name, count(*) as cpt from movielens.genome_tags
+	select 'genome_tags' as name, count(*) as cpt from genome_tags
 union all
-	select 'links' as name, count(*) as cpt from movielens.links
+	select 'links' as name, count(*) as cpt from links
 union all
-	select 'movies' as name, count(*) as cpt from movielens.movies
+	select 'movies' as name, count(*) as cpt from movies
 union all
-	select 'ratings' as name, count(*) as cpt from movielens.ratings
+	select 'ratings' as name, count(*) as cpt from ratings
 union all
-	select 'tags' as name, count(*) as cpt from movielens.tags
+	select 'tags' as name, count(*) as cpt from tags
 ;

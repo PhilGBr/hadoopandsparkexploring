@@ -36,16 +36,21 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws Exception {
+    	
+    	String schema="movielens";
+    	if(args.length>0) {
+    		schema=args[0];
+    	}
 
         try(SparkSession spark = initSparkSession()) {
 
         	benchClass(GroupMoviesByRatings.class, GroupMoviesByRatings.METHODS_UNDER_TEST
         			, new Class[] { SparkSession.class, String.class }
-        			, spark, "movielens");
+        			, spark, schema);
         	
         	benchClass(FindMoviesWithLowestAvgRating.class, FindMoviesWithLowestAvgRating.METHODS_UNDER_TEST
         			, new Class[] { SparkSession.class, String.class, int.class, int.class }
-        			, spark, "movielens", 1000, 10);
+        			, spark, schema, 1000, 10);
 
         } catch(Exception e) {
         	LOGGER.error(e.getMessage(), e);

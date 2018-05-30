@@ -12,7 +12,7 @@ seg_ratings AS
          END as segment_rater
   from (
     select user_id, count(*) as nb_ratings
-    from movielens.ratings
+    from ratings
     group by user_id
   ) as user_nb_ratings
 ),
@@ -29,11 +29,11 @@ seg_tags AS
          END as segment_tagger
   from (
     select user_id, count(*) as nb_tags
-    from movielens.tags
+    from tags
     group by user_id
   ) as user_nb_tags
 )
-INSERT OVERWRITE TABLE movielens.users(user_id, segment_rater, segment_tagger)
+INSERT OVERWRITE TABLE users(user_id, segment_rater, segment_tagger)
 SELECT seg_ratings.user_id, segment_rater, segment_tagger
 FROM seg_ratings FULL OUTER JOIN seg_tags
   ON (seg_ratings.user_id = seg_tags.user_id);

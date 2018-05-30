@@ -2,6 +2,7 @@
 
 # This script:
 #   - defines and exports the environment variables used by the different scripts
+#	- defines the get_hive_cnx_url() utility function
 #   - creates the ${LOCAL_MOVIELENS_DATADIR} directory hierarchy under the user home directoty executing this script
 #
 #
@@ -29,8 +30,38 @@ export HDFS_MOVIELENS_DATADIR=/tmp/data/movielens-data-200
 export HDFS_MOVIELENS_DATADIR_FOR_HIVE=/tmp/data/movielens-data-200-copy-for-hive
 
 
-# JDBC URL Cnx to HIVE
-export HIVE2_SRV_URL=jdbc:hive2://sandbox.hortonworks.com:10000/default
+# JDBC URL Cnx to HIVE: component are defined separately  
+#
+# 	See  https://cwiki.apache.org/confluence/display/Hive/HiveServer2+Clients#HiveServer2Clients-ConnectionURLs
+
+
+export HIVE2_PROTOCOL="jdbc:hive2"
+export HIVE2_HOST="sandbox.hortonworks.com"
+export HIVE2_IP="10000"
+export HIVE2_DEFAULT_DB="default"
+
+# If no extra connection string parameters are required, leave it blank 
+export HIVE2_EXTRA_CNX_STRING_PARAM=""
+
+# Optionally, you can pass one argument that override the ${HIVE2_DEFAULT_DB} variable
+get_hive_cnx_url() {
+
+	URL="${HIVE2_PROTOCOL}://${HIVE2_HOST}:${HIVE2_IP}"	
+	
+	if [ -n "$1" ]; then
+		URL="${URL}/$1"	
+	elif [ -n "$HIVE2_DEFAULT_DB" ]; then
+		URL="${URL}/${HIVE2_DEFAULT_DB}"	
+	else
+		URL="${URL}/default"
+	fi
+	
+	if [ -n "$HIVE2_EXTRA_CNX_STRING_PARAM" ]; then
+		URL="${URL};${HIVE2_EXTRA_CNX_STRING_PARAM}" 
+	fi
+	echo $URL
+}
+
 
 # Make sure UTF-8 is the default encoding (as CSV files to be loaded by HIVE are UTF-8 encoded)
 export LANG=en_US.UTF-8

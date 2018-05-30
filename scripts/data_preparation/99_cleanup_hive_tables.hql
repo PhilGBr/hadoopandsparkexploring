@@ -1,8 +1,7 @@
-DROP TABLE IF EXISTS movielens.users;
-DROP TABLE IF EXISTS movielens.tags;
-DROP TABLE IF EXISTS movielens.ratings;
-DROP TABLE IF EXISTS movielens.movies;
-DROP TABLE IF EXISTS movielens.links;
-DROP TABLE IF EXISTS movielens.genome_scores;
-DROP TABLE IF EXISTS movielens.genome_tags;
-DROP DATABASE IF EXISTS movielens;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS tags;
+DROP TABLE IF EXISTS ratings;
+DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS links;
+DROP TABLE IF EXISTS genome_scores;
+DROP TABLE IF EXISTS genome_tags;
