@@ -136,8 +136,6 @@ A date, le repository contient:<ul>
 <h1>Reste à faire</h1>
 <h2>Corrections</h2>
 <p>En l'état, 2 erreurs d'exécution sur le cluster HDP n'ont pas encore été corrigées. Elles concernent toutes les deux les implémentations RDD. Ces erreurs ne se produisent pas dans les tests unitaires.<p>
-<p>Par ailleurs, un clean up du programme Main.java doit être réalisé: le code de création de l'instance SparkSession n'est plus adapté à la méthode de lancement (via spark-submit).</p>
-<h2>Next Steps</h2>
 <p><ul>
 <li> Faire varier les clauses de stockages des tables HIVE pour observer les effets sur les temps de traitements</li>
 <li> "Scaler les données", ajouter et faire varier les clauses de partionnements, et constater les effets en terme de temps de traitement</li>
