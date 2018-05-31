@@ -10,6 +10,7 @@ public class Movie implements Serializable {
     private int movieId;
     private String title;
     private String genres;
+    
     public int getMovieId() {
         return movieId;
     }

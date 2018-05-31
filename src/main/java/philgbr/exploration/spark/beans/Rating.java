@@ -9,7 +9,7 @@ public class Rating implements Serializable {
     private int userId;
     private int movieId;
     private float rating;
-    private String timestamp;
+    private int timestamp;
     
     
     public int getUserId() {
@@ -30,10 +30,10 @@ public class Rating implements Serializable {
     public void setRating(float rating) {
         this.rating = rating;
     }
-    public String getTimestamp() {
+    public int getTimestamp() {
         return timestamp;
     }
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(int timestamp) {
         this.timestamp = timestamp;
     }
     @Override
@@ -42,7 +42,7 @@ public class Rating implements Serializable {
         int result = 1;
         result = prime * result + movieId;
         result = prime * result + Float.floatToIntBits(rating);
-        result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
+        result = prime * result + timestamp;
         result = prime * result + userId;
         return result;
     }
@@ -64,11 +64,7 @@ public class Rating implements Serializable {
         if (Float.floatToIntBits(rating) != Float.floatToIntBits(other.rating)) {
             return false;
         }
-        if (timestamp == null) {
-            if (other.timestamp != null) {
-                return false;
-            }
-        } else if (!timestamp.equals(other.timestamp)) {
+        if (timestamp != other.timestamp) {
             return false;
         }
         if (userId != other.userId) {

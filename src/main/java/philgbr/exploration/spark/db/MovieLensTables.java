@@ -42,7 +42,7 @@ public enum MovieLensTables {
 						new StructField[] { new StructField("user_id", DataTypes.IntegerType, false, Metadata.empty()),
 								new StructField("movie_id", DataTypes.IntegerType, false, Metadata.empty()),
 								new StructField("rating", DataTypes.FloatType, false, Metadata.empty()),
-								new StructField("time", DataTypes.StringType, false, Metadata.empty()) }));
+								new StructField("time", DataTypes.IntegerType, false, Metadata.empty()) }));
 
 		schemas.put(LINKS,
 				new StructType(
@@ -54,7 +54,7 @@ public enum MovieLensTables {
 						new StructField[] { new StructField("user_id", DataTypes.IntegerType, false, Metadata.empty()),
 								new StructField("movie_id", DataTypes.IntegerType, false, Metadata.empty()),
 								new StructField("tag", DataTypes.StringType, false, Metadata.empty()),
-								new StructField("time", DataTypes.StringType, false, Metadata.empty()) }));
+								new StructField("time", DataTypes.IntegerType, false, Metadata.empty()) }));
 		schemas.put(GENOME_SCORES,
 				new StructType(
 						new StructField[] { new StructField("movie_id", DataTypes.IntegerType, false, Metadata.empty()),

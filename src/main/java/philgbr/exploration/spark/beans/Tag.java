@@ -9,7 +9,7 @@ public class Tag implements Serializable {
     private int userId;
     private int movieId;
     private String tag;
-    private String timestamp;
+    private int timestamp;
     
     
     public int getUserId() {
@@ -30,20 +30,19 @@ public class Tag implements Serializable {
     public void setTag(String tag) {
         this.tag = tag;
     }
-    public String getTimestamp() {
+    public int getTimestamp() {
         return timestamp;
     }
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(int timestamp) {
         this.timestamp = timestamp;
     }
-    
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + movieId;
         result = prime * result + ((tag == null) ? 0 : tag.hashCode());
-        result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
+        result = prime * result + timestamp;
         result = prime * result + userId;
         return result;
     }
@@ -69,11 +68,7 @@ public class Tag implements Serializable {
         } else if (!tag.equals(other.tag)) {
             return false;
         }
-        if (timestamp == null) {
-            if (other.timestamp != null) {
-                return false;
-            }
-        } else if (!timestamp.equals(other.timestamp)) {
+        if (timestamp != other.timestamp) {
             return false;
         }
         if (userId != other.userId) {
