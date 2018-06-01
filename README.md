@@ -60,6 +60,16 @@ A date, le repository contient:<ul>
 
 
 <h2>Installation</h2>
+L'installation décrite ici repose sur les éléments suivant:<ul>
+<li><b>un poste local</b><ul>
+<li>sur lequel est cloné le présent repository git</li>
+<li>et à partir duquel on peut explorer le code avec un IDE et réaliser le <code>build</code></li></ul></li>
+<li><b>un noeud driver</b> participant à un cluster Hadoop Spark<ul>
+<li>vers lequel sont copiés les scripts et .jar nécessaires</li>
+<li>et depuis lequel est exécuté le programme contenu dans ce repository.</li></ul>
+</ul>
+
+<p>Naturellement, il est également possible de cloner le repository et réaliser le build directement depuis le noeud driver.</p>
 
 <h3>Etape 1: clone du repository</h3>
 
@@ -72,10 +82,17 @@ A date, le repository contient:<ul>
 <p><code>export LOCAL_MOVIELENS_DATADIR=~/tmp/movielens   -- (stockage du dataset <b>sur le fs local du noeud driver</b>)</code></p>  
 <p><code>export HDFS_MOVIELENS_DATADIR=/tmp/data/movielens-data-200  -- (stockage du dataset <b>sous HDFS</b>)</code></p> 
 <p><code>export HDFS_MOVIELENS_DATADIR_FOR_HIVE=/tmp/data/movielens-data-200-copy-for-hive  -- (copie du dataset <b>sous HDFS</b>)</code></p>
-<p><code>export <b>HIVE2_SRV_URL</b>=jdbc:hive2://sandbox.hortonworks.com:10000/default</code></p>
+<p><code>
+export <b>HIVE2_PROTOCOL</b>="jdbc:hive2"<p>
+export <b>HIVE2_HOST</b>="sandbox.hortonworks.com"<p>
+export <b>HIVE2_IP</b>="10000"<p>
+export <b>HIVE2_DEFAULT_DB</b>="default"<p>
+#If no extra connection string parameters are required, leave it blank <p>
+export <b>HIVE2_EXTRA_CNX_STRING_PARAM</b>=""<p>
+</code></p>
 
 <h3>Etape 3: copie des scripts sur le noeud driver</h3>
-<h3>Etape 3.1: preparation des répertoires sur le fs local du driver</h3>
+<h4>Etape 3.1: preparation des répertoires sur le fs local du driver</h4>
 
 <p><code>ssh -p &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; &lt;user&gt;@&lt;ip&gt;</code></p>
 <p><code>mkdir spark-test</code></p>
@@ -83,10 +100,10 @@ A date, le repository contient:<ul>
 <p><code>mkdir scripts</code></p>
 <p>Après exécution, quitter pour revenir à la session sur le poste (de dev)</p>
 <p><code>exit</code></p>
-<h3>Etape 3.2: copie depuis le poste (de dev) sur le fs local du driver</h3>
+<h4>Etape 3.2: copie depuis le poste (de dev) sur le fs local du driver</h4>
 <p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/data_preparation/* &lt;user&gt;@&lt;ip&gt;:~/spark-test/scripts</code></p>
 <p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/launching/run_with_spark-submit.sh &lt;user&gt;@&lt;ip&gt;:~/spark-test</code></p>
-<h3>Etape 3.3: Execution du script de chargement depuis le driver</h3>
+<h4>Etape 3.3: Execution du script de chargement depuis le driver</h4>
 <p><code>ssh -p &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; &lt;user&gt;@&lt;ip&gt;</code></p>
 <p><code>cd spark-test</code></p>
 <p><code>./scripts/run_all.sh</code></p>
