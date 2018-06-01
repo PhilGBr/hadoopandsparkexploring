@@ -1,13 +1,14 @@
 #!/bin/bash
 
-## Mandatory parameter(s)
+## Optional parameter(s)
 ##  ->  $1 : schema name (AKA database name) to be created and populated; if not defined
-##			 the value 'movieslens' is used
+##			 the value 'movielens' is used
 ##
 
 if [ -n "$1" ]; then
 	MY_SCHEMA=$1	
 else
+	echo "No schema was provided as an argument: using 'movielens' as schema name"
 	MY_SCHEMA="movielens"
 fi
 
