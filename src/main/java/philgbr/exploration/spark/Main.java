@@ -72,16 +72,14 @@ public class Main {
      */
     @SuppressWarnings("rawtypes")
 	static void benchClass(Class<?> utClass, String[] utMethods, Class[] signature, Object... args)  throws Exception {
-    	String curMethod = null;
-		try {
-			Object underTest = utClass.newInstance();
-			for (String methodName : utMethods) {
-				curMethod=methodName;
+		Object underTest = utClass.newInstance();
+		for (String methodName : utMethods) {
+			try {
 				Method method = utClass.getMethod(methodName, signature);
 				method.invoke(underTest, args);
+			} catch(Exception e) {
+				LOGGER.error(String.format("An error occured during the execution of %s.%s", utClass.getName(), methodName), e);
 			}
-		} catch(Exception e) {
-				LOGGER.error(String.format("An error occured during the execution of %s.%s", utClass.getName(), curMethod), e);
-			}
+		}
 	}    		
 }
