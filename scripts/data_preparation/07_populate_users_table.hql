@@ -33,7 +33,10 @@ seg_tags AS
     group by user_id
   ) as user_nb_tags
 )
-INSERT OVERWRITE TABLE users(user_id, segment_rater, segment_tagger)
+--INSERT OVERWRITE TABLE users (user_id, segment_rater, segment_tagger) 
+--   -> despite HIVE-9481, cannot figure out how to have this working 
+--   => sqeeze column list specification from this INSERT statement
+INSERT OVERWRITE TABLE users
 SELECT seg_ratings.user_id, segment_rater, segment_tagger
 FROM seg_ratings FULL OUTER JOIN seg_tags
   ON (seg_ratings.user_id = seg_tags.user_id);
