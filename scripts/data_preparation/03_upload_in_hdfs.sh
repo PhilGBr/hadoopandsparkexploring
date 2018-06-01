@@ -18,9 +18,19 @@ echo "Copying files to HDFS directories"
 cd ml-latest
 files=$(ls *.csv)
 for file in $files; do
-   echo "  copying: ${file}"
-   hdfs dfs -copyFromLocal $file $HDFS_MOVIELENS_DATADIR
-   hdfs dfs -cp $HDFS_MOVIELENS_DATADIR/$file $HDFS_MOVIELENS_DATADIR_FOR_HIVE
+	
+	# Hive support for 'skip.header.line.count' does not span outside its own context 
+	# (even for MANAGED TABLES) and thus does not span to Spark Sessions
+	#  
+	# => it's cleaner to trim data at the source, rather that spilling out implementation
+	#  details (like spark.read(...).option("header" -> "true") in client application
+	# source code
+	
+   echo " skipping 1st line then copying: ${file}"
+   tail -n +2 ${file} > "${file}.trimmed"
+   hdfs dfs -copyFromLocal "${file}.trimmed" $HDFS_MOVIELENS_DATADIR/${file}
+   hdfs dfs -cp $HDFS_MOVIELENS_DATADIR/${file} $HDFS_MOVIELENS_DATADIR_FOR_HIVE
+   rm "${file}.trimmed"
 done
 
 

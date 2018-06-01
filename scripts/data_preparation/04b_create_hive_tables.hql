@@ -8,8 +8,7 @@ CREATE TABLE IF NOT EXISTS genome_scores (
     tag_id INT,
     relevance FLOAT)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ESCAPED BY '"'
-STORED AS TEXTFILE
-TBLPROPERTIES ('skip.header.line.count'='1');
+STORED AS TEXTFILE;
 
 -- filename: genome-tags.csv
 -- header: tagId,tag
@@ -18,8 +17,7 @@ CREATE TABLE IF NOT EXISTS genome_tags (
     tag_id INT,
     tag STRING)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ESCAPED BY '"'
-STORED AS TEXTFILE
-TBLPROPERTIES ('skip.header.line.count'='1');
+STORED AS TEXTFILE;
 
 
 -- filename: links.csv
@@ -30,8 +28,7 @@ CREATE TABLE IF NOT EXISTS links (
     imdb_id INT,
     tmdb_id INT)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ESCAPED BY '"'
-STORED AS TEXTFILE
-TBLPROPERTIES ('skip.header.line.count'='1');
+STORED AS TEXTFILE;
 
 
 -- filename: movies.csv
@@ -42,8 +39,7 @@ CREATE TABLE IF NOT EXISTS movies (
     title STRING,
     genres STRING)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ESCAPED BY '"'
-STORED AS TEXTFILE
-TBLPROPERTIES ('skip.header.line.count'='1');
+STORED AS TEXTFILE;
 
 
 -- filename: ratings.csv
@@ -56,8 +52,7 @@ CREATE TABLE IF NOT EXISTS ratings (
     rating FLOAT,
     time INT)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ESCAPED BY '"'
-STORED AS TEXTFILE
-TBLPROPERTIES ('skip.header.line.count'='1');
+STORED AS TEXTFILE;
 
 
 
@@ -71,8 +66,7 @@ CREATE TABLE IF NOT EXISTS tags (
     tag STRING,
     time INT)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ESCAPED BY '"'
-STORED AS TEXTFILE
-TBLPROPERTIES ('skip.header.line.count'='1');
+STORED AS TEXTFILE;
 
 
 -- no filename: the users table will contain user statistics derived from ratings and tags tables
