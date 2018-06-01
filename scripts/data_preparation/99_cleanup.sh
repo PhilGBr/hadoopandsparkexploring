@@ -1,11 +1,15 @@
 #!/bin/bash
 
 ## Mandatory parameter(s)
-##	-> $1: the schema name (AKA database name) in which tables are located
+##  ->  $1 : schema name (AKA database name) to be created and populated; if not defined
+##			 the value 'movielens' is used
+##
 
-if [ -z "$1" ]; then
-	echo "Arg \$1 (the schema name) is missing. Exit script ${0}"
-	exit 0
+if [ -n "$1" ]; then
+	MY_SCHEMA=$1	
+else
+	echo "No schema was provided as an argument: using 'movielens' as schema name"
+	MY_SCHEMA="movielens"
 fi
 
 #  Load environment variables
@@ -18,11 +22,11 @@ rm -rf ${LOCAL_MOVIELENS_DATADIR}
 
 
 # Clean up HIVE tables
-echo "cleaning up HIVE tables"
+echo "cleaning up HIVE tables for schema $MY_SCHEMA"
 
-HIVE2_SRV_URL=$(get_hive_cnx_url $1)	
+HIVE2_SRV_URL=$(get_hive_cnx_url $MY_SCHEMA)	
 beeline -u ${HIVE2_SRV_URL} -f ./99_cleanup_hive_tables.hql --verbose=$HIVE_VERBOSE --silent=$BEELINE_SILENT
-beeline  -u ${HIVE2_SRV_URL} -e "DROP DATABASE IF EXISTS $1" --verbose=$HIVE_VERBOSE --silent=$BEELINE_SILENT;
+beeline  -u ${HIVE2_SRV_URL} -e "DROP DATABASE IF EXISTS $MY_SCHEMA" --verbose=$HIVE_VERBOSE --silent=$BEELINE_SILENT;
 
 # Clean up HDFS
 echo "cleaning up HDFS directories"
