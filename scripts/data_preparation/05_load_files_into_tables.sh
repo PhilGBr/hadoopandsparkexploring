@@ -12,6 +12,12 @@ fi
 #  Load environment variables
 source 00_env.sh
 
+if [ -z "$2" ]; then
+        HIVE2_SRV_URL=$(get_hive_cnx_url)
+else
+        HIVE2_SRV_URL=$(get_hive_cnx_url $1)
+fi
+
 beeline  -u ${HIVE2_SRV_URL} -e "LOAD DATA INPATH '${HDFS_MOVIELENS_DATADIR_FOR_HIVE}/genome-scores.csv' OVERWRITE INTO TABLE $1.genome_scores" --verbose=$HIVE_VERBOSE --silent=$BEELINE_SILENT;
 beeline  -u ${HIVE2_SRV_URL} -e "LOAD DATA INPATH '${HDFS_MOVIELENS_DATADIR_FOR_HIVE}/genome-tags.csv' OVERWRITE INTO TABLE $1.genome_tags" --verbose=$HIVE_VERBOSE --silent=$BEELINE_SILENT;
 beeline  -u ${HIVE2_SRV_URL} -e "LOAD DATA INPATH '${HDFS_MOVIELENS_DATADIR_FOR_HIVE}/links.csv' OVERWRITE INTO TABLE $1.links" --verbose=$HIVE_VERBOSE --silent=$BEELINE_SILENT;
