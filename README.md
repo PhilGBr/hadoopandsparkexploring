@@ -6,19 +6,18 @@
 
 
 <h1>Priorités</h1>
-Spark étant un sujet "relativement" vaste et complexe (tant en terme d'APIs que de configurations de déploiement - et même que de configuration tout court !), j'ai du établir un choix drastique quant aux APIs que j'allais aborder ici.</p>
+<p>Spark étant un sujet "relativement" vaste et complexe (tant en terme d'APIs que de configurations de déploiement - et même que de configuration tout court !), j'ai du établir un choix drastique quant aux APIs que j'allais aborder ici.</p>
 <p>Le thème initialement retenu était l'étude des différentes possibilités et techniques de JOINTURE de datasets avec Spark, les jointures sur de gros volumes étant toujours une source de lenteurs et d'erreurs d'exécution (OOM, No space left on disk, ...).</p>
 <p>A date, le code ne reflète pas ce choix initial</p>
 
 <h1>Choix de la version de Spark</h1>
+<p>
 J'ai choisi de travailler avec une version Spark 2.x récente. Je me suis aligné sur la version de la distribution que j'allais employer pour les tests, à savoir [Hortonworks Data Platform 2.6.4](https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.4/bk_release-notes/content/comp_versions.html) qui supporte la version 2.2.
 </p>
 <h1>Datasets</h1>
-[The movielens data (ml-latest.zip)](https://grouplens.org/datasets/movielens/latest/)
+[The movielens data ml-latest.zip](https://grouplens.org/datasets/movielens/latest/)
 
 <h1>Réalisation</h1>
-
-
 <p>En terme d'APIs, j'ai choisi d'utiliser et de comparer les 3 APIs disponibles, à savoir Dataset, Dataframe et "RDD classic".</p>
 
 <p>La phase de réalisation m'a confronté à des obstacles plus prosaïques que le sujet initial. A titre d'exemple:<ul>
@@ -35,12 +34,9 @@ A date, le repository contient:<ul>
 <li> un script de lancement du programme via <code>spark-submit</code>
 </ul>
 </p>
-
-
 <h1>Exploitation</h1>
 <h2>Pré-requis</h2>
-
-<h3>Pré-requis: environnement au build</h1>
+<h3>Pré-requis / environnement de build (ici poste local)</h1>
 <ul>
 <li>Git</li>
 <li>Java 8+</li>
@@ -52,7 +48,7 @@ A date, le repository contient:<ul>
 </ul></ul>
 
 
-<h3>Pré-requis: environnement d'exécution</h3>
+<h3>Pré-requis / environnement d'exécution (ici noeud driver)</h3>
 <p><b>Un environnement Hadoop (HDFS, HIVE) + Spark 2.x est nécessaire</b></p>
 <p>Un compte utilisateur <b>accessible via ssh, et pour lequel l'environnement Hadoop/Spark est accessible et configuré</b></p>
 <p>Pour la création de la base HIVE et le chargement des données, les scripts de chargement nécessitent l'outil en ligne de commande beeline
@@ -73,6 +69,10 @@ L'installation décrite ici repose sur les éléments suivant:<ul>
 
 <h3>Etape 1: clone du repository</h3>
 
+<p>## Sur Windows uniquement: (re-)configuration git pour prévenir les problèmes liés à l'introduction de CRLF</p>
+<p><code>git config core.autocrlf input</code></p>
+<p><code>git config core.eol lf</code></p>
+<p>## Récupération du repository</p>
 <p><code>git clone https://github.com/PhilGBr/hadoopandsparkexploring.git</code></p>
 
 <h3>Etape 2: paramétrage des variables d'environnement pour le chargement des données</h3>
@@ -101,17 +101,11 @@ export <b>HIVE2_EXTRA_CNX_STRING_PARAM</b>=""<p>
 <p>Après exécution, quitter pour revenir à la session sur le poste (de dev)</p>
 <p><code>exit</code></p>
 <h4>Etape 3.2: copie depuis le poste (de dev) sur le fs local du driver</h4>
-<p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/data_preparation/* &lt;user&gt;@&lt;ip&gt;:~/spark-test/scripts</code></p>
-<p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; scripts/launching/run_with_spark-submit.sh &lt;user&gt;@&lt;ip&gt;:~/spark-test</code></p>
-<h4>Etape 3.3: Execution du script de chargement depuis le driver</h4>
-<p><code>ssh -p &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; &lt;user&gt;@&lt;ip&gt;</code></p>
-<p><code>cd spark-test</code></p>
-<p><code>./scripts/run_all.sh</code></p>
-<p>Après le chargement des données, quitter pour revenir à la session sur le poste (de dev)</p>
-<p><code>exit</code></p>
+<p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/rsa_private_key&gt; scripts/data_preparation/* &lt;user&gt;@&lt;ip&gt;:~/spark-test/scripts</code></p>
+<p><code>scp -P &lt;port&gt; -i &lt;/some/patch/to/rsa_private_key&gt; scripts/launching/run_with_spark-submit.sh &lt;user&gt;@&lt;ip&gt;:~/spark-test</code></p>
 
 <h2>Etape 4: Build du progamme</h2>
-<p><code>maven package</code></p>
+<p><code>mvn package</code></p>
 
 <h2>Etape 5: Déploiement sur le driver</h2>
 <code>scp -P &lt;port&gt; -i &lt;/some/patch/to/&lt;rsa_private_key&gt; target/*.jar &lt;user&gt;@&lt;ip&gt;:~/spark-test</code>
@@ -127,15 +121,21 @@ export <b>HIVE2_EXTRA_CNX_STRING_PARAM</b>=""<p>
 <p>Localiser le fichier log4j.properties de la distribution Spark installée sur le driver.</p>
 <p>Exemple: pour la distribution HDP 2.6.4 d'Hortonworks, en étant loggué en tant que <code>maria_dev</code>, le fichier se trouve sous <code>/etc/spark2/2.6.4.0-91/0/log4j.properties</code></p>
 <h3>Etape 6.2: édition du fichier</h3>
-<p>Editer le fichier, et ajouter la configuration suivante <span style="color:red">(en prenant soin de modifier le chemin vers le fichier de logs)</span>:</p>
+<p>Editer le fichier, et ajouter la configuration suivante <span style="color:red">(en prenant soin de modifier les chemins vers les 2 fichiers de logs configurés)</span>:</p>
+
+<p><code>log4j.logger.philgbr.exploration.spark=INFO, console, explorationFileAppender</code></p>
+<p><code>log4j.additivity.philgbr.exploration.spark=false</code></p>
+<p><code>log4j.appender.explorationFileAppender=org.apache.log4j.FileAppender</code></p>
+<p><code>log4j.appender.explorationFileAppender.File=<span style="color:red">/tmp/spark-test</span>/spark-exploration.log</code></p>
+<p><code>log4j.appender.explorationFileAppender.layout=org.apache.log4j.PatternLayout</code></p>
+<p><code>log4j.appender.explorationFileAppender.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss.SSS} %p %c{1}: %m%n</code></p>
+<p/>
 <p><code>log4j.logger.philgbr.exploration.spark.utils.LogExecutionTime=INFO, console, exectimeFileAppender</code></p>
-<p><code>log4.additivity.philgbr.exploration.spark.utils.LogExecutionTime=true</code></p>
-
+<p><code>log4j.additivity.philgbr.exploration.spark.utils.LogExecutionTime=true</code></p>
 <p><code>log4j.appender.exectimeFileAppender=org.apache.log4j.FileAppender</code></p>
-<p><code>log4j.appender.exectimeFileAppender.File=<span style="color:red">/tmp/spark-tasks-execution-time.log</span></code></p>
+<p><code>log4j.appender.exectimeFileAppender.File=<span style="color:red">/tmp/spark-test/</span>spark-tasks-execution-time.log</code></p>
 <p><code>log4j.appender.exectimeFileAppender.layout=org.apache.log4j.PatternLayout</code></p>
-<p><code>log4j.appender.exectimeFileAppender.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n</code></p>
-
+<p><code>log4j.appender.exectimeFileAppender.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss.SSS} %p %c{1}: %m%n</code></p>
 
 <h2>Etape 7: Lancement du programme depuis le noeud driver</h2>
 
