@@ -94,12 +94,12 @@ export HDFS_MOVIELENS_DATADIR_FOR_HIVE=/tmp/data/movielens-data-200-copy-for-hiv
 
 
 ```
-export <b>HIVE2_PROTOCOL</b>="jdbc:hive2"
-export <b>HIVE2_HOST</b>="sandbox.hortonworks.com"
-export <b>HIVE2_IP</b>="10000"
-export <b>HIVE2_DEFAULT_DB</b>="default"
+export HIVE2_PROTOCOL="jdbc:hive2"
+export HIVE2_HOST="sandbox.hortonworks.com"
+export HIVE2_IP="10000"
+export HIVE2_DEFAULT_DB="default"
 #If no extra connection string parameters are required, leave it blank
-export <b>HIVE2_EXTRA_CNX_STRING_PARAM</b>=""
+export HIVE2_EXTRA_CNX_STRING_PARAM=""
 ```
 
 #### Etape 3: copie des scripts sur le noeud driver
@@ -108,7 +108,7 @@ export <b>HIVE2_EXTRA_CNX_STRING_PARAM</b>=""
 Se connecter au noeud driver, et préparer les répertoires cibles
 
 ```
-ssh -p <port> -i </some/patch/to/&lt;rsa_private_key> <user>@<ip>
+ssh -p <port> -i </some/patch/to/rsa_private_key> <user>@<ip>
 mkdir spark-test
 cd spark-test
 mkdir scripts
@@ -119,7 +119,7 @@ exit
 ##### Etape 3.2: copie depuis le poste (de dev) sur le fs local du driver
 
 ```
-scp -P <port&gt; -i </some/patch/to/rsa_private_key> scripts/data_preparation/* <user><ip>:~/spark-test/scripts
+scp -P <port> -i </some/patch/to/rsa_private_key> scripts/data_preparation/* <user><ip>:~/spark-test/scripts
 scp -P <port> -i </some/patch/to/rsa_private_key> scripts/launching/run_with_spark-submit.sh <user>@<ip>:~/spark-test
 ```
 
@@ -171,7 +171,7 @@ log4j.appender.exectimeFileAppender.layout.ConversionPattern=%d{yy/MM/dd HH:mm:s
 Se connecter au noeud driver:
 
 ```
-ssh -p <port> -i </some/patch/to/<rsa_private_key> <user>@<ip>
+ssh -p <port> -i </some/patch/to/rsa_private_key> <user>@<ip>
 cd spark-test
 ```
 
