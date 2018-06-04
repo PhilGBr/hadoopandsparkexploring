@@ -153,7 +153,7 @@ export <b>HIVE2_EXTRA_CNX_STRING_PARAM</b>=""<p>
 
 <h1>Reste à faire</h1>
 <h2>Corrections</h2>
-<p>En l'état, 2 erreurs d'exécution sur le cluster HDP n'ont pas encore été corrigées. Elles concernent toutes les deux les implémentations RDD. Ces erreurs ne se produisent pas dans les tests unitaires.<p>
+<s><p>En l'état, 2 erreurs d'exécution sur le cluster HDP n'ont pas encore été corrigées. Elles concernent toutes les deux les implémentations RDD. Ces erreurs ne se produisent pas dans les tests unitaires.<p></s>
 <p>
 <h2>Next Steps</h2><ul>
 <li> Faire varier les clauses de stockages des tables HIVE pour observer les effets sur les temps de traitements</li>
