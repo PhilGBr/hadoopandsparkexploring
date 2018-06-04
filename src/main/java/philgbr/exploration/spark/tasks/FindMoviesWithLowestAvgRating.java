@@ -178,7 +178,7 @@ public class FindMoviesWithLowestAvgRating {
 
         public int compare(Tuple2<Integer, AvgAccumulator> t1, Tuple2<Integer, AvgAccumulator> t2) {
         	
-            int compareAvg = Float.compare(t1._2().avg(), t1._2().avg());  // Ascending order on avg rating
+            int compareAvg = Float.compare(t1._2().avg(), t2._2().avg());  // Ascending order on avg rating
             if(compareAvg != 0) {
                 return compareAvg;
             } else {
