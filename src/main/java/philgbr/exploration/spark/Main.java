@@ -6,6 +6,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import philgbr.exploration.spark.tasks.DoesNotScale;
 import philgbr.exploration.spark.tasks.FindMoviesWithLowestAvgRating;
 import philgbr.exploration.spark.tasks.GroupMoviesByRatings;
 
@@ -42,16 +43,21 @@ public class Main {
     		schema=args[0];
     	}
 
+    	
+    	LOGGER.info(String.format("Starting launching taks using schema: %s", schema));
         try(SparkSession spark = initSparkSession()) {
 
         	benchClass(GroupMoviesByRatings.class, GroupMoviesByRatings.METHODS_UNDER_TEST
+        			, true // skip NOT SCALABLE methods
         			, new Class[] { SparkSession.class, String.class }
         			, spark, schema);
         	
         	benchClass(FindMoviesWithLowestAvgRating.class, FindMoviesWithLowestAvgRating.METHODS_UNDER_TEST
+        			, true // skip NOT SCALABLE methods
         			, new Class[] { SparkSession.class, String.class, int.class, int.class }
         			, spark, schema, 1000, 10);
 
+        	LOGGER.info("The program has finished properly");
         } catch(Exception e) {
         	LOGGER.error(e.getMessage(), e);
         }
@@ -71,12 +77,21 @@ public class Main {
 	 * Sequentially invoke methods (whose names are defined in <code>utMethods</code>) on an instance of class <code>utCLass</code> with a variable number of arguments given by <code>args</code> 
      */
     @SuppressWarnings("rawtypes")
-	static void benchClass(Class<?> utClass, String[] utMethods, Class[] signature, Object... args)  throws Exception {
+	static void benchClass(Class<?> utClass, String[] utMethods, boolean skipNotScalableMethod, Class[] signature, Object... args)  throws Exception {
 		Object underTest = utClass.newInstance();
 		for (String methodName : utMethods) {
 			try {
 				Method method = utClass.getMethod(methodName, signature);
+				if(method.isAnnotationPresent(DoesNotScale.class)) {
+					if(skipNotScalableMethod) {
+						LOGGER.info(String.format("Skipping NOT scalable method of %s.%s", utClass.getName(), methodName));
+						continue;
+					} else {
+						LOGGER.warn(String.format("About to execute a method that DOES NOT scale:  %s.%s well", utClass.getName(), methodName));		
+					}
+				}
 				method.invoke(underTest, args);
+				LOGGER.info(String.format("This method was successfully executed: %s.%s", utClass.getName(), methodName));
 			} catch(Exception e) {
 				LOGGER.error(String.format("An error occured during the execution of %s.%s", utClass.getName(), methodName), e);
 			}

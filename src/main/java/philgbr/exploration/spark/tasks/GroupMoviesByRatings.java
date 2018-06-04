@@ -18,7 +18,8 @@ public class GroupMoviesByRatings {
 	public static final String[] METHODS_UNDER_TEST = {"hiveImpl1"
 														, "dfopImpl1", "dfopImpl2"
 														, "dsImpl1", "dsImpl2"
-														, "rddImpl1", "rddImpl2"};
+														, "rddImpl1"  // <-- Beware that this implementation does NOT scale  
+														, "rddImpl2"};
 
     private static final Logger LOG = LoggerFactory.getLogger(GroupMoviesByRatings.class);
 
@@ -100,9 +101,15 @@ public class GroupMoviesByRatings {
     }
 
     /**
-     * RDD implementation (
+     * RDD implementation that <b>DOES NOT scale</b>. because of the use of {@link JavaRDD#groupBy(...)} 
+     * that MUST NOT be applied to a large dataset.<p>
      *
+     * Instead, use a method relying on the {@link JavaPairRDD#reduceByKey(...)} family (or equivalent perform a first grouping
+     * on workers, before shuffling.<p>
+     * 
+     * @see #rddImpl2(SparkSession, String)
      */
+    @DoesNotScale
     @LogMyTime
     public void rddImpl1(SparkSession spark, String dbSchemaName) {
         Encoder<Rating> ratingEncoder = Encoders.bean(Rating.class);
@@ -118,7 +125,7 @@ public class GroupMoviesByRatings {
     }
 
     /**
-     * RDD implementation (
+     * RDD implementation that scales properly.<p>
      *
      */
     @LogMyTime

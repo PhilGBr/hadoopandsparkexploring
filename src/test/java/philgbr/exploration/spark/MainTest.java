@@ -16,23 +16,23 @@ public class MainTest {
     public void testBench() throws Exception {
     	
     	// Access regular public virtual method, with variable number of args
-    	Main.benchClass(InnerUnderTestClass.class, new String[] {"virtualMethod1"}, new Class[] {Map.class}, methodsCalls);
+    	Main.benchClass(InnerUnderTestClass.class, new String[] {"virtualMethod1"}, false, new Class[] {Map.class}, methodsCalls);
     	assertTrue(methodsCalls.get(InnerUnderTestClass.CALL_VIRTUAL_METHOD_1).equals(1));
 
-    	Main.benchClass(InnerUnderTestClass.class, new String[] {"virtualMethod1"}, new Class[] {Map.class, String.class}, methodsCalls, "dummy");
+    	Main.benchClass(InnerUnderTestClass.class, new String[] {"virtualMethod1"}, false, new Class[] {Map.class, String.class}, methodsCalls, "dummy");
        	assertTrue(methodsCalls.get(InnerUnderTestClass.CALL_VIRTUAL_METHOD_1_EXTRA_ARG).equals(1));
     	
     	// Let's call the later one another time .... 
-    	Main.benchClass(InnerUnderTestClass.class, new String[] {"virtualMethod1"}, new Class[] {Map.class, String.class}, methodsCalls, "dummy");
+    	Main.benchClass(InnerUnderTestClass.class, new String[] {"virtualMethod1"}, false, new Class[] {Map.class, String.class}, methodsCalls, "dummy");
     	assertTrue(methodsCalls.get(InnerUnderTestClass.CALL_VIRTUAL_METHOD_1_EXTRA_ARG).equals(2));  // .. and check our counter
     	
     	// Give a try to static method too
-    	Main.benchClass(InnerUnderTestClass.class, new String[] {"staticMethod1"}, new Class[] {Map.class}, methodsCalls);
+    	Main.benchClass(InnerUnderTestClass.class, new String[] {"staticMethod1"}, false, new Class[] {Map.class}, methodsCalls);
     	assertTrue(methodsCalls.get(InnerUnderTestClass.CALL_STATIC_METHOD_1).equals(1));
     	
   
     	// Now, checks behavior when attempting to invoke a method which is NOT ACCESSIBLE to the caller
-    	Main.benchClass(InnerUnderTestClass.class, new String[] {"virtualMethod2"}, new Class[] {Map.class}, methodsCalls);
+    	Main.benchClass(InnerUnderTestClass.class, new String[] {"virtualMethod2"}, false, new Class[] {Map.class}, methodsCalls);
     	assertNull(methodsCalls.get(InnerUnderTestClass.CALL_VIRTUAL_METHOD_2));  // the method could'nt be invoked
     }
     
